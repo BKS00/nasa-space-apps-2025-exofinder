@@ -1,102 +1,101 @@
-# nasa-space-apps-2025-exofinder
-Projet pour le NASA Space Apps Challenge 2025. Un outil d'IA pour détecter les exoplanètes.
-* **Notebook Colab Partagé :** https://colab.research.google.com/drive/15P8DN740liWaPegbb0Vwqgt-FiYYsBaa?usp=sharing
+# ExoFinder 🚀
+
+**Découvrir de Nouveaux Mondes avec une IA Rigoureuse.**
+
+Un projet pour le **NASA Space Apps Challenge 2025**, conçu par l'équipe AGI-ESPACE.
 
 ---
 
-### **Comment Utiliser le Modèle d'IA**
+### ► Résumé du Projet
 
-Le Pôle Web (JEFTE) n'a pas besoin d'interagir directement avec les notebooks ou les fichiers de modèle. Toute la logique de prédiction est encapsulée dans le script `src/prediction_pipeline.py`.
+ExoFinder est une plateforme web qui exploite un modèle de Deep Learning (Réseau de Neurones) pour accélérer la découverte d'exoplanètes. En analysant les caractéristiques physiques d'un signal issu des archives de la NASA, notre solution le classifie instantanément en "Planète Confirmée", "Candidat" ou "Faux Positif", permettant aux scientifiques de concentrer leurs efforts sur les candidats les plus prometteurs.
 
-**1. Entrée Requise**
+### 🎯 Le Défi Adressé
 
-La fonction `make_prediction` attend un dictionnaire Python contenant les **7 caractéristiques physiques** suivantes :
-*   `koi_period` (float)
-*   `koi_duration` (float)
-*   `koi_depth` (float)
-*   `koi_impact` (float)
-*   `koi_srad` (float)
-*   `koi_slogg` (float)
-*   `koi_steff` (float)
+Ce projet répond au défi **"Un monde à part : à la recherche d'exoplanètes grâce à l'IA"**. Il s'attaque au goulot d'étranglement majeur de la recherche exoplanétaire : le tri manuel d'un volume de données massif où plus de 95% des signaux sont des faux positifs.
 
-**2. Sortie Fournie**
+### ✨ Fonctionnalités Clés
 
-La fonction renvoie un dictionnaire contenant la prédiction et un score de confiance.
-*   **En cas de succès :** `{'prediction': 'CONFIRMED', 'confidence': 81.23}`
-*   **En cas d'erreur :** `{'error': 'Description de l'erreur'}`
+*   **Classification par IA :** Utilise un modèle TensorFlow/Keras entraîné sur les données Kepler pour une classification précise.
+*   **Démarche Scientifique :** Le modèle a été sélectionné après une analyse exploratoire rigoureuse et une comparaison objective avec d'autres algorithmes (Régression Logistique, Random Forest).
+*   **Interface Web Intuitive :** Une application simple pour soumettre des données et visualiser les résultats.
+*   **Pipeline Robuste :** Le code est structuré pour séparer la logique IA de l'application web, garantissant la maintenabilité et la clarté.
 
-**3. Exemple d'Utilisation dans l'Application Web (Django)**
+### 🛠️ Technologies Utilisées
+
+*   **Langage :** Python
+*   **Data Science :** TensorFlow/Keras, Scikit-learn, Pandas, Astroquery
+*   **Application Web :** DJANGO/Tailwind CSS/JavaScript
+*   **Collaboration :** Git, GitHub, Google Colab
+
+---
+
+###  डेमो Démonstration
+
+*   **▶️ Vidéo de Démonstration :** https://drive.google.com/file/d/1HmL6KZXCdCZ7YfgXUeEpGuv9EgrLNS5L/view?usp=sharing
+*   **📄 Présentation (Slides) :** https://docs.google.com/presentation/d/1vdsfOwwm4VKyj-wGPM4kyljarMta-yAN/edit?usp=sharing&ouid=112573468174670630142&rtpof=true&sd=true
+
+---
+
+### 🚀 Démarrage Rapide (Lancer l'Application Localement)
+
+Pour lancer l'application web sur votre machine :
+
+**1. Clonez le dépôt :**
+```bash
+git clone https://github.com/BKS00/nasa-space-apps-2025-exofinder.git
+cd nasa-space-apps-2025-exofinder
+```
+
+**2. Installez les dépendances :**
+```bash
+pip install -r requirements.txt
+```
+
+**3. Lancez l'application :**
+```bash
+# Exemple pour Django
+python manage.py runserver
+```
+
+**4. Ouvrez votre navigateur** à l'adresse `http://127.0.0.1:5000` (ou le port indiqué).
+
+---
+
+### 🧠 Utiliser le Module d'IA (Pour les Développeurs)
+
+Toute la logique de prédiction est encapsulée dans le script `src/prediction_pipeline.py` et sa fonction `make_prediction()`. C'est la méthode officielle et recommandée pour interagir avec notre modèle.
+
+**Entrée :** Un dictionnaire Python avec 7 clés (`koi_period`, `koi_duration`, etc.).
+**Sortie :** Un dictionnaire avec la `prediction` et la `confidence`.
+
+**Exemple d'intégration :**
 
 ```python
-# Dans le fichier utils d'une application Django (ex: utils.py)
-import numpy as np
-import pickle
-from tensorflow.keras.models import load_model
-from core.settings import BASE_DIR
+# Importez la fonction
+from src.prediction_pipeline import make_prediction
 
-# --- CONFIGURATION DES CHEMINS D'ACCÈS ---
+# Préparez vos données d'entrée
+input_data = {
+    "koi_period": 9.48, "koi_duration": 2.95, "koi_depth": 615.8,
+    "koi_impact": 0.146, "koi_srad": 0.927, "koi_slogg": 4.467, "koi_steff": 5455.0
+}
 
-SCALER_PATH = f"{BASE_DIR}/static/model/data_scaler.pkl"
-ENCODER_PATH = f"{BASE_DIR}/static/model/label_encoder.pkl"
-MODEL_PATH = f"{BASE_DIR}/static/model/exofinder_mlp_model.keras"
-
-# --- CHARGEMENT DES ARTEFACTS ---
-print("Chargement des artefacts...")
-try:
-    with open(SCALER_PATH, 'rb') as f:
-        scaler = pickle.load(f)
-
-    with open(ENCODER_PATH, 'rb') as f:
-        label_encoder = pickle.load(f)
-
-    model_mlp = load_model(MODEL_PATH)
-    print("Artefacts chargés avec succès.")
-except FileNotFoundError as e:
-    print(f"ERREUR : Fichier non trouvé. {e}")
-    print("Veuillez vérifier les chemins d'accès et que votre Drive est bien monté.")
-    exit()
-
-# --- FONCTION DE PRÉDICTION ---
-# Cette fonction encapsule tout le pipeline de pré-traitement et de prédiction.
-
-def predict_disposition(koi_period, koi_duration, koi_depth, koi_srad,
-                          koi_steff, koi_slogg, koi_impact, is_missing_feature):
-    """
-    Prédit la disposition d'un objet d'intérêt Kepler à partir de ses caractéristiques physiques.
-
-    Args:
-        (Les 8 caractéristiques finales utilisées par le modèle)
-
-    Returns:
-        str: Le nom de la classe prédite ('CONFIRMED', 'CANDIDATE', 'FALSE POSITIVE').
-        dict: Un dictionnaire des probabilités pour chaque classe.
-    """
-    # 1. Appliquer les transformations logarithmiques
-    koi_period_log = np.log1p(koi_period)
-    koi_duration_log = np.log1p(koi_duration)
-    koi_depth_log = np.log1p(koi_depth)
-    koi_srad_log = np.log1p(koi_srad)
-
-    # 2. Créer le vecteur de caractéristiques dans le bon ordre
-    features = np.array([[
-        koi_steff, koi_slogg,
-        koi_period_log, koi_duration_log,
-        koi_depth_log, koi_srad_log,
-        koi_impact,
-        is_missing_feature
-    ]])
-
-    # 3. Standardiser les données avec le scaler chargé
-    features_scaled = scaler.transform(features)
-
-    # 4. Faire la prédiction
-    probabilities = model_mlp.predict(features_scaled)[0]
-
-    # 5. Interpréter les résultats
-    predicted_index = np.argmax(probabilities)
-    predicted_class_name = label_encoder.inverse_transform([predicted_index])[0]
-
-    class_probabilities = {label: prob for label, prob in zip(label_encoder.classes_, probabilities)}
-
-    return predicted_class_name, class_probabilities
+# Obtenez le résultat
+result = make_prediction(input_data)
+print(result)
+# Sortie attendue : {'prediction': 'CONFIRMED', 'confidence': 81.23}```
 ```
+---
+
+### 👥 Notre Équipe (AGI-ESPACE)
+
+*   **Salomon Balemba :** Chef de Projet, Data Scientist
+*   **VAN TASI MUTUNDO :** Data Scientist
+*   **JEPHTE DUNIA :** Développeur Web
+
+---
+
+### 📜 Licence
+
+Ce projet est sous licence MIT. Voir le fichier `LICENSE` pour plus de détails.
