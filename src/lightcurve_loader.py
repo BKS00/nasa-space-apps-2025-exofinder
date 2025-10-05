@@ -1,0 +1,1 @@
+# Ce module sera responsable du téléchargement et du formatage des données de courbe de lumière brutes.
