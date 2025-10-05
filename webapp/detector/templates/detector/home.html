@@ -1,0 +1,255 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Home Page{% endblock %}
+
+{% block content %}
+    <div class="max-w-7xl mx-auto">
+        <header class="bg-gradient-to-r from-purple-600 to-indigo-700 text-white py-12 px-8 text-center rounded-t-3xl shadow-2xl">
+            <img src="{% static 'logo/logo.jpg' %}" alt="Logo ExoFinder" class="mx-auto mb-4 h-20 w-auto"/>
+            <h1 class="text-4xl md:text-5xl font-bold mb-3">ExoFinder</h1>
+            <p class="text-lg md:text-xl font-light opacity-95">Découvrez les secrets des mondes lointains avec les données Kepler</p>
+            
+            <!-- Lien vers les informations du modèle -->
+            <div class="mt-6">
+                <a href="{% url 'model_info' %}" class="inline-flex items-center px-6 py-3 bg-white bg-opacity-20 hover:bg-opacity-30 text-white rounded-xl transition-all backdrop-blur-sm font-semibold shadow-lg hover:shadow-xl">
+                    <span class="text-xl mr-2">🤖</span>
+                    <span>Informations sur le Modèle IA</span>
+                </a>
+            </div>
+        </header>
+
+        <!-- Messages Django -->
+        {% if messages %}
+            {% for message in messages %}
+            <div class="mb-6 p-4 rounded-xl border-l-4 transition-all duration-500
+                {% if message.tags == 'success' %}
+                bg-green-50 border-green-500 text-green-800
+                {% elif message.tags == 'error' %}
+                bg-red-50 border-red-500 text-red-800
+                {% elif message.tags == 'warning' %}
+                bg-yellow-50 border-yellow-500 text-yellow-800
+                {% else %}
+                bg-blue-50 border-blue-500 text-blue-800
+                {% endif %}">
+                <div class="flex items-center">
+                <span class="text-2xl mr-3">
+                    {% if message.tags == 'success' %}✅
+                    {% elif message.tags == 'error' %}❌
+                    {% elif message.tags == 'warning' %}⚠️
+                    {% else %}ℹ️
+                    {% endif %}
+                </span>
+                <div>
+                    <p class="font-semibold">{{ message }}</p>
+                </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% endif %}
+
+        <!-- Onglets -->
+        <div class="bg-white shadow-lg">
+            <div class="flex border-b border-gray-200">
+                <button onclick="switchTab('data')" id="tab-data" class="tab-button flex-1 px-6 py-4 text-center font-semibold text-purple-600 border-b-4 border-purple-600 bg-purple-50 transition-all hover:bg-purple-100">
+                    📊 Données Enregistrées
+                </button>
+                <button onclick="switchTab('form')" id="tab-form" class="tab-button flex-1 px-6 py-4 text-center font-semibold text-gray-500 border-b-4 border-transparent transition-all hover:bg-gray-50 hover:text-purple-600">
+                    ➕ Nouveau Enregistrement
+                </button>
+            </div>
+        </div>
+
+        <!-- Contenu des onglets -->
+        <div class="bg-white rounded-b-3xl shadow-2xl overflow-hidden">
+            
+            <!-- Onglet Données Enregistrées -->
+            <div id="content-data" class="tab-content block p-8">
+                <div class="mb-6 flex justify-between items-center">
+                    <h2 class="text-3xl font-bold text-gray-800">Mes Exoplanètes</h2>
+                    <span class="bg-purple-100 text-purple-700 px-4 py-2 rounded-full font-semibold">{{ exoplanets|length }} planète(s)</span>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {% for planet in exoplanets %}
+                    <div class="bg-gradient-to-br from-purple-50 to-indigo-50 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden border-2 border-purple-200 hover:border-purple-400">
+                        <div class="bg-gradient-to-r from-purple-600 to-indigo-700 text-white p-4">
+                            <div class="flex justify-between items-center">
+                                <h3 class="text-xl font-bold">🪐 Exoplanète #{{ forloop.counter }}</h3>
+                                
+                            </div>
+                            <p class="text-sm opacity-80 mt-1"></p>
+                        </div>
+                        
+                        <div class="p-4 space-y-2 text-sm">
+                            <div class="flex justify-between py-2 border-b border-purple-200">
+                                <span class="font-semibold text-gray-600">Période Orbitale:</span>
+                                <span class="text-purple-700 font-medium">{{ planet.koi_period }} j</span>
+                            </div>
+                            <div class="flex justify-between py-2 border-b border-purple-200">
+                                <span class="font-semibold text-gray-600">Durée du Transit:</span>
+                                <span class="text-purple-700 font-medium">{{ planet.koi_duration }} h</span>
+                            </div>
+                            <div class="flex justify-between py-2 border-b border-purple-200">
+                                <span class="font-semibold text-gray-600">Profondeur Transit:</span>
+                                <span class="text-purple-700 font-medium">{{ planet.koi_depth }} ppm</span>
+                            </div>
+                            <div class="flex justify-between py-2 border-b border-purple-200">
+                                <span class="font-semibold text-gray-600">Paramètre Impact:</span>
+                                <span class="text-purple-700 font-medium">{{ planet.koi_impact|floatformat:2 }}</span>
+                            </div>
+                            <div class="flex justify-between py-2 border-b border-purple-200">
+                                <span class="font-semibold text-gray-600">Rayon Stellaire:</span>
+                                <span class="text-purple-700 font-medium">{{ planet.koi_srad|floatformat:2 }} R☉</span>
+                            </div>
+                            <div class="flex justify-between py-2 border-b border-purple-200">
+                                <span class="font-semibold text-gray-600">Gravité Surface:</span>
+                                <span class="text-purple-700 font-medium">{{ planet.koi_slogg|floatformat:2 }} log(g)</span>
+                            </div>
+                            <div class="flex justify-between py-2">
+                                <span class="font-semibold text-gray-600">Température:</span>
+                                <span class="text-purple-700 font-medium">{{ planet.koi_teff }} K</span>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-purple-100 p-3 flex justify-center">
+                            <a href="{% url 'results' planet.pk %}">
+                                <button class="px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-700 text-white rounded-lg font-semibold hover:shadow-lg transition-all text-sm">
+                                    🚀 Résultat de l'analyse
+                                </button>
+                            </a>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="text-center py-20">
+                        <div class="text-6xl mb-4">🪐</div>
+                        <h3 class="text-2xl font-semibold text-gray-600 mb-2">Aucune donnée enregistrée</h3>
+                        <p class="text-gray-500 mb-6">Commencez par ajouter votre première exoplanète</p>
+                        <button onclick="switchTab('form')" class="px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-700 text-white rounded-xl font-semibold hover:shadow-lg transition-all">
+                            ➕ Ajouter une planète
+                        </button>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Onglet Formulaire -->
+            <div id="content-form" class="tab-content hidden p-8 md:p-10">
+                <h2 class="text-3xl font-bold text-gray-800 mb-6">Ajouter une Nouvelle Exoplanète</h2>
+
+        <form action="{% url 'home' %}" method="POST" class="p-8 md:p-10">
+            <!-- Période Orbitale -->
+             {% csrf_token %}
+            <div class="mb-6">
+                <label for="koi_period" class="flex items-center font-semibold text-gray-700 mb-2">
+                    Période Orbitale (en jours)
+                    <span class="group relative ml-2 cursor-help inline-block transition-transform hover:scale-110">
+                        ❓
+                        <span class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all absolute bottom-full left-1/2 transform -translate-x-1/2 -translate-y-2 bg-gray-900 text-white text-sm font-normal rounded-lg p-3 w-72 shadow-lg z-50">
+                            Le temps que met l'objet pour faire un tour complet autour de son étoile. Exemple : La Terre a une période orbitale d'environ 365 jours.
+                        </span>
+                    </span>
+                </label>
+                <input type="number" id="koi_period" name="koi_period" step="0.01" required placeholder="Ex: 365.25" 
+                       class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl bg-gray-50 focus:outline-none focus:border-purple-600 focus:bg-white focus:ring-4 focus:ring-purple-100 transition-all">
+            </div>
+
+            <!-- Durée du Transit -->
+            <div class="mb-6">
+                <label for="koi_duration" class="flex items-center font-semibold text-gray-700 mb-2">
+                    Durée du Transit (en heures)
+                    <span class="group relative ml-2 cursor-help inline-block transition-transform hover:scale-110">
+                        ❓
+                        <span class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all absolute bottom-full left-1/2 transform -translate-x-1/2 -translate-y-2 bg-gray-900 text-white text-sm font-normal rounded-lg p-3 w-72 shadow-lg z-50">
+                            Le temps total pendant lequel la luminosité de l'étoile diminue lorsque l'objet passe devant elle.
+                        </span>
+                    </span>
+                </label>
+                <input type="number" id="koi_duration" name="koi_duration" step="0.01" required placeholder="Ex: 3.5"
+                       class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl bg-gray-50 focus:outline-none focus:border-purple-600 focus:bg-white focus:ring-4 focus:ring-purple-100 transition-all">
+            </div>
+
+            <!-- Profondeur du Transit -->
+            <div class="mb-6">
+                <label for="koi_depth" class="flex items-center font-semibold text-gray-700 mb-2">
+                    Profondeur du Transit (en ppm)
+                    <span class="group relative ml-2 cursor-help inline-block transition-transform hover:scale-110">
+                        ❓
+                        <span class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all absolute bottom-full left-1/2 transform -translate-x-1/2 -translate-y-2 bg-gray-900 text-white text-sm font-normal rounded-lg p-3 w-72 shadow-lg z-50">
+                            Le pourcentage de lumière de l'étoile qui est bloqué par l'objet. Une valeur plus élevée signifie un objet plus grand.
+                        </span>
+                    </span>
+                </label>
+                <input type="number" id="koi_depth" name="koi_depth" step="0.01" required placeholder="Ex: 100"
+                       class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl bg-gray-50 focus:outline-none focus:border-purple-600 focus:bg-white focus:ring-4 focus:ring-purple-100 transition-all">
+            </div>
+
+            <!-- Paramètre d'Impact -->
+            <div class="mb-6">
+                <label for="koi_impact" class="flex items-center font-semibold text-gray-700 mb-2">
+                    Paramètre d'Impact
+                    <span class="group relative ml-2 cursor-help inline-block transition-transform hover:scale-110">
+                        ❓
+                        <span class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all absolute bottom-full left-1/2 transform -translate-x-1/2 -translate-y-2 bg-gray-900 text-white text-sm font-normal rounded-lg p-3 w-72 shadow-lg z-50">
+                            Indique le centrage du passage de l'objet devant l'étoile. Une valeur de 0 signifie un passage parfaitement au centre, tandis qu'une valeur proche de 1 signifie un passage sur le bord.
+                        </span>
+                    </span>
+                </label>
+                <input type="number" id="koi_impact" name="koi_impact" step="0.01" min="0" max="1" required placeholder="Ex: 0.5"
+                       class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl bg-gray-50 focus:outline-none focus:border-purple-600 focus:bg-white focus:ring-4 focus:ring-purple-100 transition-all">
+            </div>
+
+            <!-- Rayon de l'Étoile -->
+            <div class="mb-6">
+                <label for="koi_srad" class="flex items-center font-semibold text-gray-700 mb-2">
+                    Rayon Stellaire (en rayons solaires)
+                    <span class="group relative ml-2 cursor-help inline-block transition-transform hover:scale-110">
+                        ❓
+                        <span class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all absolute bottom-full left-1/2 transform -translate-x-1/2 -translate-y-2 bg-gray-900 text-white text-sm font-normal rounded-lg p-3 w-72 shadow-lg z-50">
+                            La taille de l'étoile, comparée à celle de notre Soleil. (1 = même taille que le Soleil).
+                        </span>
+                    </span>
+                </label>
+                <input type="number" id="koi_srad" name="koi_srad" step="0.01" required placeholder="Ex: 1.0"
+                       class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl bg-gray-50 focus:outline-none focus:border-purple-600 focus:bg-white focus:ring-4 focus:ring-purple-100 transition-all">
+            </div>
+
+            <!-- Gravité de Surface de l'Étoile -->
+            <div class="mb-6">
+                <label for="koi_slogg" class="flex items-center font-semibold text-gray-700 mb-2">
+                    Gravité de Surface (log(g))
+                    <span class="group relative ml-2 cursor-help inline-block transition-transform hover:scale-110">
+                        ❓
+                        <span class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all absolute bottom-full left-1/2 transform -translate-x-1/2 -translate-y-2 bg-gray-900 text-white text-sm font-normal rounded-lg p-3 w-72 shadow-lg z-50">
+                            La force de gravité à la surface de l'étoile. Aide à déterminer si l'étoile est une naine ou une géante.
+                        </span>
+                    </span>
+                </label>
+                <input type="number" id="koi_slogg" name="koi_slogg" step="0.01" required placeholder="Ex: 4.5"
+                       class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl bg-gray-50 focus:outline-none focus:border-purple-600 focus:bg-white focus:ring-4 focus:ring-purple-100 transition-all">
+            </div>
+
+            <!-- Température de l'Étoile -->
+            <div class="mb-6">
+                <label for="koi_teff" class="flex items-center font-semibold text-gray-700 mb-2">
+                    Température Effective (en Kelvin)
+                    <span class="group relative ml-2 cursor-help inline-block transition-transform hover:scale-110">
+                        ❓
+                        <span class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all absolute bottom-full left-1/2 transform -translate-x-1/2 -translate-y-2 bg-gray-900 text-white text-sm font-normal rounded-lg p-3 w-72 shadow-lg z-50">
+                            La température à la surface de l'étoile. Exemple : Notre Soleil a une température d'environ 5778 K.
+                        </span>
+                    </span>
+                </label>
+                <input type="number" id="koi_teff" name="koi_teff" step="0.01" required placeholder="Ex: 5778"
+                       class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl bg-gray-50 focus:outline-none focus:border-purple-600 focus:bg-white focus:ring-4 focus:ring-purple-100 transition-all">
+            </div>
+
+            <!-- Bouton de soumission -->
+            <button type="submit" class="w-full py-4 bg-gradient-to-r from-purple-600 to-indigo-700 text-white text-xl font-semibold rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-0.5 active:translate-y-0 transition-all duration-300 mt-2">
+                � Enregistrer l'Exoplanète et Analyser
+            </button>
+        </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}

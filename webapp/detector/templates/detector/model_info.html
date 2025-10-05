@@ -1,0 +1,230 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Informations sur le Modèle IA{% endblock %}
+
+{% block content %}
+    <div class="max-w-7xl mx-auto">
+        <!-- Header avec bouton retour -->
+        <div class="mb-6 transition-all duration-500">
+            <a href="{% url 'home' %}" class="inline-flex items-center px-4 py-2 bg-white bg-opacity-20 hover:bg-opacity-30 text-white rounded-xl transition-all backdrop-blur-sm">
+                <span class="text-xl mr-2">←</span>
+                <span class="font-semibold">Retour à l'accueil</span>
+            </a>
+        </div>
+
+        <!-- Carte principale -->
+        <div class="bg-white rounded-3xl shadow-2xl overflow-hidden transition-all duration-500">
+            <!-- En-tête avec gradient -->
+            <div class="bg-gradient-to-r from-purple-600 to-indigo-700 text-white p-8">
+                <div class="flex items-center justify-between mb-4">
+                    <h1 class="text-4xl font-bold">🤖 Modèle d'Intelligence Artificielle</h1>
+                </div>
+                <p class="text-lg opacity-95">Multi-Layer Perceptron (MLP) pour la Classification d'Exoplanètes</p>
+            </div>
+
+            <!-- Description du modèle -->
+            <div class="p-8 border-b border-gray-200">
+                <div class="flex items-center mb-4">
+                    <span class="text-3xl mr-3">📊</span>
+                    <h2 class="text-2xl font-bold text-gray-800">Architecture du Modèle</h2>
+                </div>
+                <p class="text-gray-700 leading-relaxed mb-4">
+                    Notre système utilise un réseau de neurones <strong>Multi-Layer Perceptron (MLP)</strong> entraîné sur les données 
+                    du télescope spatial Kepler. Ce modèle est spécialisé dans la classification des candidats planétaires en trois catégories :
+                </p>
+                <div class="grid md:grid-cols-3 gap-4 mt-4">
+                    <div class="bg-green-50 border-l-4 border-green-500 p-4 rounded-lg">
+                        <div class="flex items-center mb-2">
+                            <span class="text-2xl mr-2">✅</span>
+                            <h3 class="font-bold text-green-700">CONFIRMED</h3>
+                        </div>
+                        <p class="text-sm text-gray-600">Exoplanètes confirmées par observations multiples</p>
+                    </div>
+                    <div class="bg-yellow-50 border-l-4 border-yellow-500 p-4 rounded-lg">
+                        <div class="flex items-center mb-2">
+                            <span class="text-2xl mr-2">⭐</span>
+                            <h3 class="font-bold text-yellow-700">CANDIDATE</h3>
+                        </div>
+                        <p class="text-sm text-gray-600">Candidats nécessitant des observations supplémentaires</p>
+                    </div>
+                    <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded-lg">
+                        <div class="flex items-center mb-2">
+                            <span class="text-2xl mr-2">❌</span>
+                            <h3 class="font-bold text-red-700">FALSE POSITIVE</h3>
+                        </div>
+                        <p class="text-sm text-gray-600">Faux positifs détectés par le système</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Rapport de Classification -->
+            <div class="p-8 bg-gray-50 border-b border-gray-200">
+                <div class="flex items-center mb-6">
+                    <span class="text-3xl mr-3">📈</span>
+                    <h2 class="text-2xl font-bold text-gray-800">Rapport de Classification MLP</h2>
+                </div>
+                <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
+                    <img src="{% static 'images/classification_report_mlp.png' %}" 
+                         alt="Rapport de Classification MLP" 
+                         class="w-full h-auto rounded-lg shadow-md hover:shadow-xl transition-shadow"
+                         onerror="this.parentElement.innerHTML='<div class=\'bg-purple-100 border-2 border-purple-300 rounded-lg p-8 text-center\'><span class=\'text-6xl\'>📊</span><p class=\'text-gray-600 mt-4\'>Image du rapport de classification à venir</p><p class=\'text-sm text-gray-500 mt-2\'>Placez l\'image dans : static/images/classification_report_mlp.png</p></div>'">
+                </div>
+                <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-lg">
+                    <p class="text-sm text-gray-700">
+                        <strong class="text-blue-700">📌 Note :</strong> 
+                        Ce rapport présente les métriques de performance du modèle MLP, incluant la précision, le rappel et le F1-score 
+                        pour chaque classe de prédiction.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Matrice de Confusion -->
+            <div class="p-8 border-b border-gray-200">
+                <div class="flex items-center mb-6">
+                    <span class="text-3xl mr-3">🎯</span>
+                    <h2 class="text-2xl font-bold text-gray-800">Matrice de Confusion</h2>
+                </div>
+                <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
+                    <img src="{% static 'images/matrice_de_confusion_mlp.png' %}" 
+                         alt="Matrice de Confusion MLP" 
+                         class="w-full h-auto rounded-lg shadow-md hover:shadow-xl transition-shadow"
+                         onerror="this.parentElement.innerHTML='<div class=\'bg-indigo-100 border-2 border-indigo-300 rounded-lg p-8 text-center\'><span class=\'text-6xl\'>🎯</span><p class=\'text-gray-600 mt-4\'>Image de la matrice de confusion à venir</p><p class=\'text-sm text-gray-500 mt-2\'>Placez l\'image dans : static/images/confusion_matrix_mlp.png</p></div>'">
+                </div>
+                <div class="bg-indigo-50 border-l-4 border-indigo-500 p-4 rounded-lg">
+                    <p class="text-sm text-gray-700">
+                        <strong class="text-indigo-700">📌 Note :</strong> 
+                        La matrice de confusion visualise les prédictions correctes et incorrectes du modèle pour chaque classe, 
+                        permettant d'identifier les types d'erreurs les plus fréquents.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Observations et Conclusions -->
+            <div class="p-8 bg-gradient-to-br from-purple-50 to-indigo-50">
+                <div class="flex items-center mb-6">
+                    <span class="text-3xl mr-3">🔬</span>
+                    <h2 class="text-2xl font-bold text-gray-800">Observation et Conclusion</h2>
+                </div>
+                
+                <div class="bg-white rounded-xl shadow-lg p-6 mb-4">
+                    <h3 class="text-xl font-bold text-purple-700 mb-4">Expérimentation MLP</h3>
+                    
+                    <!-- Performance Quantitative -->
+                    <div class="mb-6">
+                        <div class="flex items-start mb-3">
+                            <span class="text-2xl mr-3 mt-1">📊</span>
+                            <div>
+                                <h4 class="text-lg font-semibold text-gray-800 mb-2">Performance Quantitative</h4>
+                                <p class="text-gray-700 leading-relaxed">
+                                    Le MLP atteint une performance globale légèrement supérieure à celle du Random Forest, 
+                                    avec un <strong class="text-green-600">F1-score de 0.78</strong> pour la classe CONFIRMED 
+                                    (contre 0.75) et de <strong class="text-red-600">0.84</strong> pour la classe FALSE POSITIVE 
+                                    (contre 0.83).
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Analyse des Erreurs -->
+                    <div class="mb-6">
+                        <div class="flex items-start mb-3">
+                            <span class="text-2xl mr-3 mt-1">🔍</span>
+                            <div>
+                                <h4 class="text-lg font-semibold text-gray-800 mb-2">Analyse des Erreurs</h4>
+                                <p class="text-gray-700 leading-relaxed">
+                                    Le MLP maintient les points forts du Random Forest tout en améliorant légèrement la précision 
+                                    et le rappel sur les classes d'intérêt. Cependant, il ne résout pas la difficulté inhérente 
+                                    à la classification de la classe <strong class="text-yellow-600">CANDIDATE</strong>.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Validation de l'Hypothèse -->
+                    <div class="mb-4">
+                        <div class="flex items-start mb-3">
+                            <span class="text-2xl mr-3 mt-1">✓</span>
+                            <div>
+                                <h4 class="text-lg font-semibold text-gray-800 mb-2">Validation de l'Hypothèse</h4>
+                                <p class="text-gray-700 leading-relaxed">
+                                    Notre hypothèse selon laquelle le MLP n'apporterait pas d'amélioration spectaculaire est confirmée. 
+                                    Cependant, l'amélioration, bien que marginale, est <strong class="text-purple-600">constante 
+                                    sur les métriques les plus importantes</strong>.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Résumé en chiffres -->
+                <div class="grid md:grid-cols-3 gap-4 mt-6">
+                    <div class="bg-gradient-to-br from-green-500 to-emerald-600 text-white rounded-xl p-6 shadow-lg">
+                        <div class="text-4xl font-bold mb-2">78%</div>
+                        <div class="text-sm opacity-90">F1-Score CONFIRMED</div>
+                    </div>
+                    <div class="bg-gradient-to-br from-yellow-500 to-amber-600 text-white rounded-xl p-6 shadow-lg">
+                        <div class="text-4xl font-bold mb-2">~75%</div>
+                        <div class="text-sm opacity-90">Précision CANDIDATE</div>
+                    </div>
+                    <div class="bg-gradient-to-br from-red-500 to-rose-600 text-white rounded-xl p-6 shadow-lg">
+                        <div class="text-4xl font-bold mb-2">84%</div>
+                        <div class="text-sm opacity-90">F1-Score FALSE POSITIVE</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Métadonnées du modèle -->
+            <div class="p-8 bg-white">
+                <div class="flex items-center mb-6">
+                    <span class="text-3xl mr-3">⚙️</span>
+                    <h2 class="text-2xl font-bold text-gray-800">Spécifications Techniques</h2>
+                </div>
+                <div class="grid md:grid-cols-2 gap-4">
+                    <div class="bg-gray-50 p-4 rounded-xl border border-gray-200">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="font-semibold text-gray-700">Type de Modèle</span>
+                            <span class="text-purple-700 font-bold">Multi-Layer Perceptron</span>
+                        </div>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-xl border border-gray-200">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="font-semibold text-gray-700">Framework</span>
+                            <span class="text-purple-700 font-bold">TensorFlow/Keras</span>
+                        </div>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-xl border border-gray-200">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="font-semibold text-gray-700">Nombre de Classes</span>
+                            <span class="text-purple-700 font-bold">3 (CONFIRMED, CANDIDATE, FALSE POSITIVE)</span>
+                        </div>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-xl border border-gray-200">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="font-semibold text-gray-700">Source de Données</span>
+                            <a href="https://www.google.com/url?q=https%3A%2F%2Fexoplanetarchive.ipac.caltech.edu%2Fcgi-bin%2FTblView%2Fnph-tblView%3Fapp%3DExoTbls%26config%3Dcumulative" target="_blank" class="text-purple-700 font-bold">Kepler Objects of Interest (KOIs)</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="p-8 bg-gray-50 flex flex-col sm:flex-row gap-4 justify-center">
+                <a href="{% url 'home' %}" class="px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-700 text-white rounded-xl font-semibold hover:shadow-lg transition-all flex items-center justify-center">
+                    <span class="text-xl mr-2">🏠</span>
+                    Retour à l'accueil
+                </a>
+                <button onclick="window.print()" class="px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-700 text-white rounded-xl font-semibold hover:shadow-lg transition-all flex items-center justify-center">
+                    <span class="text-xl mr-2">🖨️</span>
+                    Imprimer cette page
+                </button>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="mt-6 text-center text-white text-sm opacity-80">
+            <p>Modèle d'Intelligence Artificielle pour la Détection d'Exoplanètes</p>
+            <p class="mt-1">© 2025 - Analyse d'Exoplanètes avec Kepler</p>
+        </div>
+    </div>
+{% endblock %}

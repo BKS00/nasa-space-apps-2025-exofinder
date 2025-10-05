@@ -1,0 +1,256 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+    <div class="max-w-5xl mx-auto">
+        <!-- Header avec boutons retour et info modèle -->
+        <div class="mb-6 transition-all duration-500 flex justify-between items-center">
+            <a href="{% url 'home' %}" class="inline-flex items-center px-4 py-2 bg-white bg-opacity-20 hover:bg-opacity-30 text-white rounded-xl transition-all backdrop-blur-sm">
+                <span class="text-xl mr-2">←</span>
+                <span class="font-semibold">Retour à la liste</span>
+            </a>
+            <a href="{% url 'model_info' %}" class="inline-flex items-center px-4 py-2 bg-white bg-opacity-20 hover:bg-opacity-30 text-white rounded-xl transition-all backdrop-blur-sm">
+                <span class="text-xl mr-2">🤖</span>
+                <span class="font-semibold">Info Modèle IA</span>
+            </a>
+        </div>
+        <!-- Messages Django -->
+        {% if messages %}
+            {% for message in messages %}
+            <div class="mb-6 p-4 rounded-xl border-l-4 transition-all duration-500
+                {% if message.tags == 'success' %}
+                bg-green-50 border-green-500 text-green-800
+                {% elif message.tags == 'error' %}
+                bg-red-50 border-red-500 text-red-800
+                {% elif message.tags == 'warning' %}
+                bg-yellow-50 border-yellow-500 text-yellow-800
+                {% else %}
+                bg-blue-50 border-blue-500 text-blue-800
+                {% endif %}">
+                <div class="flex items-center">
+                <span class="text-2xl mr-3">
+                    {% if message.tags == 'success' %}✅
+                    {% elif message.tags == 'error' %}❌
+                    {% elif message.tags == 'warning' %}⚠️
+                    {% else %}ℹ️
+                    {% endif %}
+                </span>
+                <div>
+                    <p class="font-semibold">{{ message }}</p>
+                </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% endif %}
+
+        <!-- Carte principale -->
+        <div class="bg-white rounded-3xl shadow-2xl overflow-hidden transition-all duration-500">
+            <!-- En-tête avec gradient -->
+            <div class="bg-gradient-to-r from-purple-600 to-indigo-700 text-white p-8">
+                <div class="flex items-center justify-between mb-4">
+                    <h1 class="text-4xl font-bold">🪐 Exoplanète #<span>{{ planet.id }}</span></h1>
+                    <span id="dateDisplay" class="text-sm opacity-90 bg-white bg-opacity-20 px-4 py-2 rounded-full backdrop-blur-sm"></span>
+                </div>
+                <p class="text-lg opacity-95">Analyse complète des données Kepler</p>
+            </div>
+
+            <!-- Résultat de la prédiction - Section principale -->
+            <div class="p-8 bg-gradient-to-br {{ dominant_prediction.bg_gradient }} border-b-4 {{ dominant_prediction.border_gradient }} transition-all duration-500">
+                <div class="text-center mb-6">
+                    <h2 class="text-3xl font-bold text-gray-800 mb-2">🔬 Résultat de l'Analyse</h2>
+                    <p class="text-gray-600">Prédiction basée sur les données du télescope spatial Kepler</p>
+                </div>
+
+                <!-- Taux de confiance principal (le plus grand) -->
+                <div class="bg-white rounded-3xl p-8 shadow-2xl mb-6 border-4 {{ dominant_prediction.border_color }} transition-all duration-500 hover:shadow-lg">
+                    <div class="text-center">
+                        <h3 class="text-2xl font-semibold text-gray-700 mb-4">🏆 Prédiction Dominante</h3>
+                        
+                        <div class="mb-6">
+                            <div class="text-7xl mb-4">{{ dominant_prediction.icon }}</div>
+                            <div class="inline-block px-10 py-5 bg-gradient-to-r {{ dominant_prediction.label_color }} text-white text-3xl font-bold rounded-2xl shadow-2xl mb-4 transform hover:scale-105 transition-transform">
+                                {{ dominant_prediction.name }}
+                            </div>
+                            <div class="text-6xl font-bold mb-4 {{ dominant_prediction.text_color }}">
+                                {{ dominant_prediction.value|floatformat:2 }}%
+                            </div>
+                            
+                            <!-- Barre de progression principale -->
+                            <div class="max-w-md mx-auto">
+                                <div class="w-full bg-gray-200 rounded-full h-6 overflow-hidden shadow-inner">
+                                    <div class="h-full bg-gradient-to-r {{ dominant_prediction.bar_color }} rounded-full transition-all duration-1000 ease-out shadow-lg animate-pulse" style="width: {{ dominant_prediction.value }}%"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <p class="text-base text-gray-600 mt-4 px-4">
+                            <strong>💡 Interprétation :</strong> 
+                            Le modèle d'IA a déterminé avec le plus haut niveau de confiance que cette exoplanète 
+                            correspond à la catégorie <strong>{{ dominant_prediction.name }}</strong>.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Taux de confiance secondaires -->
+                <div class="grid md:grid-cols-2 gap-4">
+                    <!-- Taux Confirmed -->
+                    <div class="bg-white rounded-2xl p-5 shadow-lg border border-green-200 transition-all duration-300 hover:shadow-xl" id="confirmedCard">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center">
+                                <span class="text-3xl mr-3">✅</span>
+                                <h4 class="text-lg font-semibold text-gray-700">Confirmed</h4>
+                            </div>
+                            <span class="text-2xl font-bold text-green-600">{{ prediction.confirmed|floatformat:2 }}%</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
+                            <div class="h-full bg-gradient-to-r from-green-400 to-emerald-500 rounded-full transition-all duration-700" style="width: {{ prediction.confirmed }}%"></div>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-2">Planète confirmée</p>
+                    </div>
+
+                    <!-- Taux Candidate -->
+                    <div class="bg-white rounded-2xl p-5 shadow-lg border border-yellow-200 transition-all duration-300 hover:shadow-xl" id="candidateCard">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center">
+                                <span class="text-3xl mr-3">⭐</span>
+                                <h4 class="text-lg font-semibold text-gray-700">Candidate</h4>
+                            </div>
+                            <span class="text-2xl font-bold text-yellow-600">{{ prediction.candidate|floatformat:2 }}%</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
+                            <div class="h-full bg-gradient-to-r from-yellow-400 to-amber-500 rounded-full transition-all duration-700" style="width: {{ prediction.candidate }}%"></div>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-2">Planète candidate</p>
+                    </div>
+
+                    <!-- Taux False Positive (sur toute la largeur) -->
+                    <div class="bg-white rounded-2xl p-5 shadow-lg border border-red-200 transition-all duration-300 hover:shadow-xl md:col-span-2" id="falsePositiveCard">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center">
+                                <span class="text-3xl mr-3">❌</span>
+                                <h4 class="text-lg font-semibold text-gray-700">False Positive</h4>
+                            </div>
+                            <span class="text-2xl font-bold text-red-600">{{ prediction.false_positive|floatformat:2 }}%</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
+                            <div class="h-full bg-gradient-to-r from-red-400 to-rose-500 rounded-full transition-all duration-700" style="width: {{ prediction.false_positive }}%"></div>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-2">Faux positif détecté</p>
+                    </div>
+                </div>
+
+                <!-- Note technique -->
+                <div class="mt-6 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border-l-4 border-blue-500">
+                    <p class="text-sm text-gray-700">
+                        <strong class="text-blue-700">� Note Technique :</strong> 
+                        Ces taux de confiance représentent la probabilité que le candidat appartienne à chaque catégorie, 
+                        calculée par notre modèle de réseau de neurones entraîné sur les données Kepler.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Paramètres orbitaux -->
+            <div class="p-8 border-b border-gray-200">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                    <span class="text-3xl mr-3">🌍</span>
+                    Paramètres Orbitaux
+                </h2>
+                <div class="grid md:grid-cols-2 gap-4">
+                    <div class="bg-purple-50 p-4 rounded-xl border border-purple-200">
+                        <div class="flex justify-between items-center">
+                            <span class="font-semibold text-gray-700">Période Orbitale</span>
+                            <span class="text-purple-700 font-bold text-lg"><span id="koi_period">{{ candidat.koi_period }}</span> jours</span>
+                        </div>
+                        <p class="text-xs text-gray-600 mt-2">Temps pour compléter une orbite</p>
+                    </div>
+                    
+                    <div class="bg-indigo-50 p-4 rounded-xl border border-indigo-200">
+                        <div class="flex justify-between items-center">
+                            <span class="font-semibold text-gray-700">Durée du Transit</span>
+                            <span class="text-indigo-700 font-bold text-lg"><span id="koi_duration">{{ candidat.koi_duration }}</span> heures</span>
+                        </div>
+                        <p class="text-xs text-gray-600 mt-2">Durée du passage devant l'étoile</p>
+                    </div>
+                    
+                    <div class="bg-purple-50 p-4 rounded-xl border border-purple-200">
+                        <div class="flex justify-between items-center">
+                            <span class="font-semibold text-gray-700">Profondeur du Transit</span>
+                            <span class="text-purple-700 font-bold text-lg"><span id="koi_depth">{{ candidat.koi_depth }}</span> ppm</span>
+                        </div>
+                        <p class="text-xs text-gray-600 mt-2">Diminution de luminosité observée</p>
+                    </div>
+                    
+                    <div class="bg-indigo-50 p-4 rounded-xl border border-indigo-200">
+                        <div class="flex justify-between items-center">
+                            <span class="font-semibold text-gray-700">Paramètre d'Impact</span>
+                            <span class="text-indigo-700 font-bold text-lg" id="koi_impact">{{ candidat.koi_impact }}</span>
+                        </div>
+                        <p class="text-xs text-gray-600 mt-2">Centrage du passage (0 = centre)</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Caractéristiques stellaires -->
+            <div class="p-8 bg-gray-50">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                    <span class="text-3xl mr-3">⭐</span>
+                    Caractéristiques de l'Étoile Hôte
+                </h2>
+                <div class="grid md:grid-cols-3 gap-4">
+                    <div class="bg-white p-5 rounded-xl shadow-md border-t-4 border-yellow-400">
+                        <div class="text-center">
+                            <div class="text-4xl mb-2">📏</div>
+                            <p class="text-sm text-gray-600 mb-1">Rayon Stellaire</p>
+                            <p class="text-2xl font-bold text-yellow-600"><span id="koi_srad">{{ candidat.koi_srad }}</span> R☉</p>
+                            <p class="text-xs text-gray-500 mt-1">Comparé au Soleil</p>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white p-5 rounded-xl shadow-md border-t-4 border-orange-400">
+                        <div class="text-center">
+                            <div class="text-4xl mb-2">⚖️</div>
+                            <p class="text-sm text-gray-600 mb-1">Gravité de Surface</p>
+                            <p class="text-2xl font-bold text-orange-600"><span id="koi_slogg">{{ candidat.koi_slogg }}</span></p>
+                            <p class="text-xs text-gray-500 mt-1">log(g) en cgs</p>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white p-5 rounded-xl shadow-md border-t-4 border-red-400">
+                        <div class="text-center">
+                            <div class="text-4xl mb-2">🌡️</div>
+                            <p class="text-sm text-gray-600 mb-1">Température Effective</p>
+                            <p class="text-2xl font-bold text-red-600"><span id="koi_teff">{{ candidat.koi_teff }}</span> K</p>
+                            <p class="text-xs text-gray-500 mt-1">Température de surface</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section d'actions avec bouton d'impression -->
+            <div class="p-8 border-t border-gray-200 bg-gradient-to-r from-gray-50 to-blue-50">
+                <div class="flex justify-center items-center gap-6">
+                    <button onclick="window.print()" class="inline-flex items-center px-8 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white text-lg font-semibold rounded-2xl transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl">
+                        <span class="text-2xl mr-3">🖨️</span>
+                        <span>Imprimer le Rapport</span>
+                    </button>
+                    <a href="{% url 'home' %}" class="inline-flex items-center px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white text-lg font-semibold rounded-2xl transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl">
+                        <span class="text-2xl mr-3">🔄</span>
+                        <span>Nouvelle Analyse</span>
+                    </a>
+                </div>
+                <p class="text-center text-gray-600 text-sm mt-4">
+                    💡 Le rapport sera optimisé pour l'impression en format A4
+                </p>
+            </div>
+            
+        </div>
+
+        <!-- Footer -->
+        <div class="mt-6 text-center text-white text-sm opacity-80">
+            <p>Données analysées par le système d'Intelligence </p>
+            <p class="mt-1">© 2025 - Analyse d'Exoplanètes</p>
+        </div>
+    </div>
+
+    
+{% endblock %}

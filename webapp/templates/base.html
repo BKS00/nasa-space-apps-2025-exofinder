@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .tooltip {
+            visibility: hidden;
+            opacity: 0;
+            transition: opacity 0.3s, transform 0.3s;
+        }
+        .info-icon:hover .tooltip {
+            visibility: visible;
+            opacity: 1;
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-purple-600 via-purple-700 to-indigo-800 p-5">
+    {% block content %}
+        <p>This is the base content.</p>
+    {% endblock %}
+
+    <!-- JavaScript Scripts -->
+    <script src="{% static 'js/script.js' %}"></script>
+</body>
+</html>
