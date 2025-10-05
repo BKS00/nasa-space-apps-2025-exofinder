@@ -25,21 +25,78 @@ La fonction renvoie un dictionnaire contenant la prédiction et un score de conf
 *   **En cas de succès :** `{'prediction': 'CONFIRMED', 'confidence': 81.23}`
 *   **En cas d'erreur :** `{'error': 'Description de l'erreur'}`
 
-**3. Exemple d'Utilisation dans l'Application Web (Flask/FastAPI)**
+**3. Exemple d'Utilisation dans l'Application Web (Django)**
 
 ```python
-# Dans le fichier de votre application web (ex: app.py)
-from src.prediction_pipeline import make_prediction
+# Dans le fichier utils d'une application Django (ex: utils.py)
+import numpy as np
+import pickle
+from tensorflow.keras.models import load_model
+from core.settings import BASE_DIR
 
-# ... (code de votre route Flask/FastAPI)
-@app.route('/predict', methods=['POST'])
-def predict():
-    # 1. Récupérer les données du formulaire web
-    input_data = request.get_json()
+# --- CONFIGURATION DES CHEMINS D'ACCÈS ---
 
-    # 2. Appeler notre pipeline de prédiction
-    result = make_prediction(input_data)
+SCALER_PATH = f"{BASE_DIR}/static/model/data_scaler.pkl"
+ENCODER_PATH = f"{BASE_DIR}/static/model/label_encoder.pkl"
+MODEL_PATH = f"{BASE_DIR}/static/model/exofinder_mlp_model.keras"
 
-    # 3. Renvoyer le résultat au frontend
-    return jsonify(result)
+# --- CHARGEMENT DES ARTEFACTS ---
+print("Chargement des artefacts...")
+try:
+    with open(SCALER_PATH, 'rb') as f:
+        scaler = pickle.load(f)
+
+    with open(ENCODER_PATH, 'rb') as f:
+        label_encoder = pickle.load(f)
+
+    model_mlp = load_model(MODEL_PATH)
+    print("Artefacts chargés avec succès.")
+except FileNotFoundError as e:
+    print(f"ERREUR : Fichier non trouvé. {e}")
+    print("Veuillez vérifier les chemins d'accès et que votre Drive est bien monté.")
+    exit()
+
+# --- FONCTION DE PRÉDICTION ---
+# Cette fonction encapsule tout le pipeline de pré-traitement et de prédiction.
+
+def predict_disposition(koi_period, koi_duration, koi_depth, koi_srad,
+                          koi_steff, koi_slogg, koi_impact, is_missing_feature):
+    """
+    Prédit la disposition d'un objet d'intérêt Kepler à partir de ses caractéristiques physiques.
+
+    Args:
+        (Les 8 caractéristiques finales utilisées par le modèle)
+
+    Returns:
+        str: Le nom de la classe prédite ('CONFIRMED', 'CANDIDATE', 'FALSE POSITIVE').
+        dict: Un dictionnaire des probabilités pour chaque classe.
+    """
+    # 1. Appliquer les transformations logarithmiques
+    koi_period_log = np.log1p(koi_period)
+    koi_duration_log = np.log1p(koi_duration)
+    koi_depth_log = np.log1p(koi_depth)
+    koi_srad_log = np.log1p(koi_srad)
+
+    # 2. Créer le vecteur de caractéristiques dans le bon ordre
+    features = np.array([[
+        koi_steff, koi_slogg,
+        koi_period_log, koi_duration_log,
+        koi_depth_log, koi_srad_log,
+        koi_impact,
+        is_missing_feature
+    ]])
+
+    # 3. Standardiser les données avec le scaler chargé
+    features_scaled = scaler.transform(features)
+
+    # 4. Faire la prédiction
+    probabilities = model_mlp.predict(features_scaled)[0]
+
+    # 5. Interpréter les résultats
+    predicted_index = np.argmax(probabilities)
+    predicted_class_name = label_encoder.inverse_transform([predicted_index])[0]
+
+    class_probabilities = {label: prob for label, prob in zip(label_encoder.classes_, probabilities)}
+
+    return predicted_class_name, class_probabilities
 ```
